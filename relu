@@ -1,0 +1,53 @@
+import numpy as np
+from sympy import *
+import random
+import matplotlib.pyplot as plt
+
+t = np.linspace(0,1,5,endpoint=True)
+theta = np.zeros(5)
+loss=1
+M = 0#iteration step
+alpha = 0.01#step length
+def relu(x):
+    return np.maximum(0, x)
+def e(t,theta):
+    return 0.5*((theta[1]**2)*(t[1]-t[0])+(theta[2]**2)*(t[2]-t[1])+(theta[3]**2)*(t[3]-t[2])+(theta[4]**2)*(t[4]-t[3]))\
++(theta[1])*(t[4]-t[0])+(theta[2]-theta[1])*(t[4]-t[1])+(theta[3]-theta[2])*(t[4]-t[2])+(theta[4]-theta[3])*(t[4]-t[3])
+
+while  loss > 1.0e-9 and M < 1000:
+   loss = 0
+
+   d_dt0 = -0.5*(theta[1]**2) + 2*(theta[1]*(t[0]-t[4]))
+   d_dt1 = 0.5*(theta[1]**2-theta[2]**2) + 2*(theta[1]-theta[2])*(t[4]-t[1])
+   d_dt2 = 0.5*(theta[2]**2-theta[3]**2) + 2*(theta[2]-theta[3])*(t[4]-t[2])
+   d_dt3 = 0.5*(theta[3]**2-theta[4]**2) + 2*(theta[3]-theta[4])*(t[4]-t[3])
+   d_dt4 = 0.5*(theta[4]**2)+2*(theta[1]*(t[1]-t[0])+theta[2]*(t[2]-t[1])+theta[3]*(t[3]-t[2])+theta[4]*(t[3]-t[4]))
+
+   # 更新t
+   t[0] = t[0] - alpha * d_dt0
+   t[1] = t[1] - alpha * d_dt1
+   t[2] = t[2] - alpha * d_dt2
+   t[3] = t[3] - alpha * d_dt3
+   t[4] = t[4] - alpha * d_dt4
+
+   # 更新theta
+   theta[1] = ((t[4]-t[1])**2-(t[4]-t[0])**2)/(t[1]-t[0])
+   theta[2] = ((t[4]-t[2])**2-(t[4]-t[1])**2)/(t[2]-t[1])
+   theta[3] = ((t[4]-t[3])**2-(t[4]-t[2])**2)/(t[3]-t[2])
+   theta[4] = ((t[4]-t[3])**2)/(theta[3]-theta[4])
+
+   loss = e(t,theta)
+   M += 1
+
+fig = plt.figure()
+x = np.linspace(0, 1, 10)
+y1 = (theta[1]-theta[0])*relu(x-t[0]) + (theta[2]-theta[1])*relu(x-t[1]) + (theta[3]-theta[2])*relu(x-t[2]) + (theta[4]-theta[3])*relu(x-t[3])
+y2 = x**2 - x
+loss_1 = np.abs(y1-y2)
+print(loss_1)
+l1, = plt.plot(x, y1, color='red', linewidth='2.0', label='trial solution')
+l2, = plt.plot(x, y2, color='blue', linewidth='1.0', label='analytic solution')
+plt.legend(handles = [l1,l2],labels=['trial solution','analytic solution'],loc='best')
+plt.show()
+print(loss)
+print('第{}次迭代,权重系数:({},{})'.format(M,t,theta))
