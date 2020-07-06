@@ -1,0 +1,59 @@
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import numpy as np
+x_train = np.linspace(0,4,100,endpoint=True)#生成[0,4]区间100个点
+y_train = np.exp(-0.5*x_train**2)/(1+x_train+x_train**3)+x_train**2#已知解析解用于比较
+x_t = np.zeros((len(x_train),1))
+for i in range(len(x_train)):
+    x_t[i] = x_train[i]
+x1 = tf.placeholder("float", [None,1 ])#一次传入100个点[100,1]表示1列行不定
+W = tf.Variable(tf.random_normal([1, 10]))
+b = tf.Variable(tf.random_normal([1, 10]))
+y1 = tf.nn.sigmoid(tf.matmul(x1, W)+b)#sigmoid激活函数y1的形状[100,10]
+W1 = tf.Variable(tf.random_normal([10, 1]))
+b1 = tf.Variable(tf.random_normal([1]))
+y = tf.matmul(y1, W1)#网络的输出[100,1]
+lq = (1+3*(x1**2))/(1+x1+x1**3)
+dif = tf.matmul(tf.multiply(y1*(1-y1),W),W1)*x1+y1#dy/dx,dif形状[100,1],即对应点的导数值
+t_loss = (dif+(x1+lq)*y-x1**3-2*x1-lq*x1*x1)**2#常微分方程F的平方
+loss = tf.reduce_mean(t_loss)+(y[0]-1)**2#每点F平方求和后取平均再加上边界条件
+train_step = tf.train.AdamOptimizer(1e-3).minimize(loss)#Adam优化器训练网络参数
+init = tf.global_variables_initializer()
+sess = tf.InteractiveSession()
+sess.run(init)
+
+for i in range(50000):#训练50000次
+    sess.run(train_step,feed_dict={x1: x_t})
+    if i%50 == 0:
+        total_loss = sess.run(loss,feed_dict={x1: x_t})
+        print("loss={}".format(total_loss))
+        print(sess.run(y[0], feed_dict={x1: x_t}))
+saver = tf.train.Saver(max_to_keep=1)#保存模型，训练一次后可以将训练过程注释掉
+saver.save(sess,'ckpt/nn.ckpt',global_step=50000)
+saver = tf.train.Saver(max_to_keep=1)
+model_file="ckpt/nn.ckpt-50000"
+saver.restore(sess, model_file)
+output = sess.run(y,feed_dict={x1:x_t})
+output1 = sess.run(t_loss,feed_dict={x1:x_t})
+y_output = x_train.copy()
+y_output1 = x_train.copy()
+for i in range(len(x_train)):
+    y_output[i] = output[i]
+   # y_output1[i] = output1[i]
+y_d = 1+ x_train*y_output
+
+fig = plt.figure("预测曲线")
+plt.ylim((-0.5,4.5))
+plt.plot(x_train,y_d)
+#plt.plot(x_train,y_trail)
+
+y2 = y_train-y_d
+
+
+fig1 = plt.figure("solution accuracy")
+plt.ylabel('Solution Accuracy')
+plt.xlabel('X')
+plt.plot(x_train,y2)
+plt.xlim((0,2))
+
+plt.show()
