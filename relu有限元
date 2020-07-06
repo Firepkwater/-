@@ -1,0 +1,70 @@
+import numpy as np
+from sympy import *
+import random
+import matplotlib.pyplot as plt
+'''
+model problem:{\rm{ - }}{{\rm{u}}^{''}}(x) = 2, {\rm{u}}(0) = u(1) = 0
+近似解定义为\sum\limits_{i = 0}^4 ( {\theta _{i + 1}} - {\theta _i}){\mathop{\rm Re}\nolimits} lu(x - {t_i})
+'''
+t = np.linspace(0,1,9,endpoint=True)
+x1 = np.random.uniform(0,0.125)
+x2 = np.random.uniform(0.125,0.25)
+x3 = np.random.uniform(0.25,0.375)
+x4 = np.random.uniform(0.375,0.5)
+x5 = np.random.uniform(0.5,0.625)
+x6 = np.random.uniform(0.625,0.75)
+x7 = np.random.uniform(0.75,0.875)
+x8 = np.random.uniform(0.875,1)
+
+theta = np.zeros(9)
+loss = 1
+M = 0#iteration step
+alpha = 1.0e-60#step length
+
+def relu(x):
+    return np.maximum(0, x)
+#定义最小化能量积分
+def e(t,theta):
+    A = 0.5*(np.square(theta[1])*(t[1] - t[0]) + np.square(theta[2])*(t[2] - t[1]) + np.square(theta[3])*(t[3] - t[2]) +\
+             np.square(theta[4])*(t[4] - t[3])
+
+    B =  (theta[1])*(t[1]-t[0])**2+(theta[1])*(t[2]-t[0])**2+(theta[2]-theta[1])*(t[2]-t[1])
+    return A - B
+while loss > 1.0e-9 and M < 1000:
+    loss = 0
+    de_dt0 = -0.5*(theta[1]**2) - 2*(-8*theta[1])
+    de_dt1 = 0.5*(theta[1]**2-theta[0]**2) - 2*(7*(theta[1] - theta[2]))
+    de_dt2 = 0.5*(theta[2]**2-theta[3]**2) - 2*(6*(theta[2] - theta[3]))
+    de_dt3 = 0.5*(theta[3]**2-theta[4]**2) - 2*(5*(theta[3] - theta[4]))
+    de_dt4 = 0.5*(theta[4]**2-theta[5]**2) - 2*(4*(theta[4] - theta[5]))
+    de_dt5 = 0.5*(theta[5]**2-theta[6]**2) - 2*(3*(theta[5] - theta[6]))
+    de_dt6 = 0.5*(theta[6]**2-theta[7]**2) - 2*(2*(theta[6] - theta[7]))
+    de_dt7 = 0.5*(theta[7]**2-theta[8]**2) - 2*(theta[7] - theta[8])
+    de_dt8 = 0.5*(theta[8]**2)
+
+
+    #更新t
+    t[0] = t[0] - alpha * de_dt0
+    t[1] = t[1] - alpha * de_dt1
+    t[2] = t[2] - alpha * de_dt2
+    t[3] = t[3] - alpha * de_dt3
+    t[4] = t[4] - alpha * de_dt4
+
+    #更新theta
+    theta[1] = (2*(x1-t[0]+x2-t[0]+x3-t[0]+x4-t[0]+x5-t[0]+x6-t[0]+x7-t[0]+x8-t[0]+t[1]-x2+t[1]-x3+t[1]-x4+t[1]-x5+t[1]-x6+t[1]-x7+t[1]-x8))/(t[1]-t[0])
+    theta[2] = (2*(x2-t[1]+x3-t[1]+x4-t[1]+x5-t[1]+x6-t[1]+x7-t[1]++x8-t[1]+t[2]-x3+t[2]-x4+t[2]-x5+t[2]-x6+t[2]-x7+t[2]-x8))/(t[2]-t[1])
+    theta[3] = (2*(x3-t[2]+x4-t[2]+x5-t[2]+x6-t[2]+x7-t[2]+x8-t[2]+t[3]-x4+t[3]-x5+t[3]-x6+t[3]-x7+t[3]-x8))/(t[3]-t[2])
+    theta[4] = (2*(x4-t[3]+x5-t[3]+x6-t[3]+x7-t[3]+x8-t[3]+t[4]-x5+t[4]-x6+t[4]-x7+t[4]-x8))/(t[4]-t[3])
+    theta[5] = (2*(x5-t[4]+x6-t[4]+x7-t[4]+x8-t[4]+t[5]-x6+t[5]-x7+t[5]-x8))/(t[5]-t[4])
+    theta[6] = (2*(x6-t[5]+x7-t[5]+x8-t[5]+t[6]-x7+t[6]-x8))/(t[6]-t[5])
+    theta[7] = (2*(x7-t[6]+x8-t[6]+t[7]-x8))/(t[7]-t[6])
+    theta[8] = (2*(x8-t[7]))/(t[8]-t[7])
+
+    loss = e(t,theta)
+    M += 1
+
+print("x:",x1,x2,x3,x4,x5,x6,x7,x8)
+print("e:",loss)
+print('第{}次迭代,总误差:{},权重系数:({},{})'.format(M,loss, t,theta))
+
+
