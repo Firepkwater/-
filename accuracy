@@ -1,0 +1,81 @@
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import numpy as np
+from sympy import symbols, diff
+w = tf.Variable(tf.random_normal([1, 10]))
+x = np.linspace(0,2,100,endpoint=True)
+
+
+w = tf.Variable(tf.random_normal([1, 10]))
+lmb = 0.001
+
+def A(x):
+    return x + (1. + 3. * x ** 2) / (1. + x + x ** 3)
+def B(x):
+    return x ** 3 + 2. * x + x ** 2 * ((1. + 3. * x ** 2) / (1. + x + x ** 3))
+def f(x, y):
+    return B(x) - y * A(x)
+
+def y_analytic(x):
+    return (np.exp((-x ** 2) / 2.)) / (1. + x + x ** 3) + x ** 2
+
+
+def neural_network(w, x):#定义了N(x,p)
+    a1 = sigmoid(np.dot(w, x)+u)
+    return np.dot(v, a1)
+
+
+def d_neural_network_dx(w, x):#定义dN/dx
+    return tf.dot(v,(tf.multiply(a1*(1-a1),w))
+
+net_out = neural_network(w, x)[0][0]
+y_t = 1. + x* net_out
+
+def loss_function(w, x):
+    loss_sum = 0.
+    for xi in x:
+        #net_out = neural_network(w, xi)[0][0]
+        #y_t = 1. + xi * net_out
+        d_net_out = d_neural_network_dx(w, xi)[0][0]
+        d_y_t = net_out + xi * d_net_out
+        func = f(xi, y_t)
+        err_sqr = (d_y_t - func) ** 2
+        loss_sum += err_sqr
+    return loss_sum
+
+print(neural_network(W, np.array([1, 1])))
+x, y = symbols('x y', real=True)
+
+for i in range(10):
+    d2_neural_network_dx =diff(d_neural_network_dx, x)
+    d_f=diff(f(x, y_t ),x)
+    loss_grad1=2*(neural_network+x*d_neural_network_dx-f(x, y_t ))*(1+x*d2_neural_network_dx-d_f*x)*v*a1*(1-a1)*x
+    loss_grad2=2*(neural_network+x*d_neural_network_dx-f(x, y_t ))*(1+x*d2_neural_network_dx-d_f*x)*v*a1*(1-a1)*1
+
+    #loss_grad = grad(loss_function)(W, x_space, y_space)
+    W[0] = W[0] - lmb * loss_grad1
+    v[1] = v[1] - lmb * loss_grad2
+
+print(loss_function(W, x_space, y_space))
+print(neural_network(W, np.array([1, 1])))
+print(y_t)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
