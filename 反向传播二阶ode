@@ -1,0 +1,46 @@
+import numpy as np
+import matplotlib.pyplot as plt
+def sigmoid(x):
+    return 1 / (np.exp(-x)+1)
+'''求解 \frac{{{d^2}\psi (x)}}{{d{x^2}}} = 4的解，且初始条件为\psi (0) = 1，{\psi ^'}(0) = 1
+根据论文其trial solution为1 + x + x^2 * h, h=v*sigmoid(z),z=wx+b
+真解为2x^2+x+1
+'''
+
+x = np.random.rand(1)
+w = np.random.rand(1)#初始化权重
+b1 = np.ones(1)#初始化偏置
+v = np.random.rand(1)
+alpha = 0.006#学习率
+def bp(w,b1,v):
+    #1 正向传播求损失
+    z = w*x + b1
+    h = sigmoid(z)
+    d2_h = h*(1-h)*(1-h)*w - h*h*(1-h)*w
+    o1 = 1 + x + (x**2) * v * h#trial solution
+    o2 = 2*v*h + 2*x*v*h*(1-h)*w + (x**2)*v*d2_h#对trial solution的二次求导
+    e = np.square(o2 - 4) / 2.0#损失函数
+
+    #2 反向传播更新权重w，偏置b1,v
+    t1 = o2 - 4
+    t2 = 2*v + 2*x*v*w*(1-2*h) + (x**2)*v*(-h*(1-h)*w + (1-h)*d2_h*w - h*(1-h)*w -h*d2_h*w)
+
+    v = v - alpha*t1*(2*h + 2*x*h*(1-h) + (x**2)*d2_h)
+    w = w - alpha*t1*t2*h*(1-h)*x
+    b1 = b1 - alpha*t1*t2*h*(1-h)
+
+    return v,w,b1,o1,e
+
+for i in range(1001):
+    v, w, b1, o1, e = bp(w, b1 ,v)
+    print('第{}次迭代：预测值:{},总误差:{},权重系数:({},{},{})'.format(i,o1,e,w,v,b1))
+
+fig = plt.figure()
+x = np.linspace(0, 1, 10)
+y1 = 1 + x + (x**2)*v* sigmoid(w*x + b1)
+y2 = 2 * (x**2) + x + 1
+l1, = plt.plot(x, y1, color='red', linewidth='2.0', label='trial solution')
+l2, = plt.plot(x, y2, color='blue', linewidth='2.0', label='analytic solution')
+#plt.plot(x,y1,'b-',linewidth='2.0',label='y2')
+plt.legend()
+plt.show()
