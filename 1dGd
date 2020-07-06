@@ -1,0 +1,44 @@
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+
+def f1(x):
+    return 0.5*(x-0.25)**2
+def h1(x):
+    return 0.5*2*(x-0.25)
+
+GD_X = []
+GD_Y = []
+x = 4
+alpha = 0.5
+f_change = f1(x)
+f_current = f_change
+GD_X.append(x)
+GD_Y.append(f_current)
+
+#迭代次数
+iter_num = 0
+
+while f_change > 1e-10 and iter_num <100:
+    iter_num +=1
+    x = x-alpha * h1(x)
+    tmp = f1(x)
+    #判断y值变化  不能太小
+    f_change = np.abs(f_current-tmp)
+    f_current = tmp
+    GD_X.append(x)
+    GD_Y.append(f_current)
+print(u'最终结果:(%.5f,%.5f)'%(x, f_current))
+print(u'迭代次数是:%.d'%iter_num)
+print(GD_X)
+
+X = np.arange(-4,4.5,0.05)
+Y = np.array(list(map(lambda t:f1(t),X)))#lambda相当于命名了一个函数
+plt.figure(facecolor='w')
+plt.plot(X,Y,'r-',linewidth=2)
+plt.plot(GD_X,GD_Y,'bo--',linewidth=2)
+plt.title(u'函数$y=0.5*(x-0.25)^2$')
+plt.show()
+
+
