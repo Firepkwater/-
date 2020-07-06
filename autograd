@@ -1,0 +1,55 @@
+from torch.autograd import Variable
+import torch
+import numpy.random as npr
+import numpy as np
+import tensorflow as tf
+
+x = Variable(torch.Tensor([1]),requires_grad=True)
+w = Variable(torch.Tensor([2]),requires_grad=True)
+b = Variable(torch.Tensor([3]),requires_grad=True)
+
+y = w*x+b
+y.backward()
+print(x.grad)
+print(w.grad)
+
+import torch
+
+x = torch.randn(3, 4).requires_grad_(True)
+for i in range(3):
+    for j in range(4):
+        x[i][j] = i + j
+y = x ** 2
+print(x)
+print(y)
+weight = torch.ones(y.size())
+print(weight)
+dydx = torch.autograd.grad(outputs=y,
+                           inputs=x,
+                           grad_outputs=weight,
+                           retain_graph=True,
+                           create_graph=True,
+                           only_inputs=True)
+
+print(dydx[0])
+
+import numpy as np
+import tensorflow as tf
+from torch.autograd import grad
+import numpy.random as npr
+from sympy import *
+import numpy as np
+import  sympy as sym
+from matplotlib import pyplot as plt
+from matplotlib import pyplot, cm
+from mpl_toolkits.mplot3d import Axes3D
+def sigmoid(x):
+    return 1/(1+np.exp(-x))
+def neural_network(W, x):
+    a1 = sigmoid(np.dot(x, W[0])+b)
+    return np.dot(a1, W[1])
+b = np.random.rand(1, 10)
+W = [np.random.rand(2, 10), np.random.rand(10, 1)]
+A = neural_network(W, np.array([1,1]))
+print(A)
+
