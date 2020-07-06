@@ -1,0 +1,59 @@
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+fig = plt.figure()
+ax = Axes3D(fig)
+# 生成x,y的网格数据
+x = np.linspace(-1,1,10)
+y =  np.linspace(-1,1,10)
+
+x, y = np.meshgrid(x, y)
+R =  np.exp(-x)*(x+y**3)
+
+z = R
+
+ax.plot_surface(x, y, z, rstride=50, cstride=50, cmap=plt.get_cmap('rainbow'))
+ax.set_zlim(-1,1)
+
+plt.xlabel('x')
+plt.ylabel('y')
+#plt.title('Fig 8 Exact solution of PDE problem 5')
+plt.show()
+
+
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+import numpy as np
+
+fig = plt.figure()
+ax = Axes3D(fig)
+X = np.arange(0, 1, 0.25)
+Y = np.arange(0, 1, 0.25)
+
+X, Y = np.meshgrid(X, Y)
+R =(Y**2)*(np.sin(np.pi*X))
+
+Z = R
+
+ax.plot_surface(X, Y, Z, rstride=50, cstride=50, cmap=plt.get_cmap('rainbow'))
+ax.set_zlim(-0.1,1)
+
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Fig 11 Exact solution of PDE problem 6 and 7')
+plt.show()
+
+#Fig1
+x = np.linspace(0,4,100)#从-1到1 生成100个点
+y1 =( np.exp(-x**2/2))/(1+x+x**3)+x**2
+y2 = (np.exp(-x/5))*(np.sin(x))
+
+plt.ylim((-0.5,4.5))
+plt.ylabel('Solution')
+plt.xlabel('X')
+l1, =plt.plot(x,y1,color='red',linewidth='5.0',linestyle='-')
+l2, =plt.plot(x,y2,color='blue',linewidth='1.0',linestyle='--')
+plt.legend(handles = [l1,l2],labels=['(a)','(b)'],loc='best')
+plt.show()
+
