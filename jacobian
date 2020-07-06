@@ -1,0 +1,79 @@
+from sympy import *
+import numpy as np
+import  sympy as sym
+
+x, y= symbols('x y', real=True)
+g = exp(-x)*(x+y**3)
+a = diff(g,x,2)
+b=diff(g,y,2)
+c = (a+b).subs(x,2)
+
+
+print(c)
+
+
+x, y= symbols('x y', real=True)
+z = 1/(x+y)
+print(z.diff(x))
+
+
+x, y= symbols('x y', real=True)
+f = Matrix([exp(-x)*(x+y**3)])
+#v = Matrix([x , y])
+print(f.jacobian(Matrix([x , y])))
+
+
+
+
+vars = sym.symbols('x y')
+f = sym.sympify(['exp(-x)*(x+y**3)'])
+H = sym.zeros(len(vars),len(vars))
+for i, fi in enumerate(f):
+    for j, r in enumerate(vars):
+        for k, s in enumerate(vars):
+            H[j,k] = sym.diff(sym.diff(fi, r),s)
+print(H)
+
+
+import tensorflow as tf
+def sigmoid(x):
+    return 1. / (1. + np.exp(-x))
+def neural_network(W0,W1, x):#x=(xi,yi)
+    a1 = sigmoid(np.dot(x,W0)+b)
+    return np.dot(a1,W1)
+a=np.ones((2, 10))
+c= np.ones((10, 1))
+b=0
+x = np.array([1,1])
+print(neural_network(a,c, x))
+
+
+
+
+
+def f(x,y):
+    return x+y
+
+def loss_function(w,x,y):
+    loss_sum = 0
+
+
+    for xi in x:
+        for yi in y:
+            psy = xi+yi*w
+            err=(psy-1)**2
+            loss_sum += err
+
+    return loss_sum
+
+x_space = np.linspace(0, 4,3)
+y_space = np.linspace(0, 4,3 )
+print (loss_function(1,x_space,y_space))
+
+
+
+
+
+
+
+
