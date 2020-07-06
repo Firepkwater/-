@@ -1,0 +1,93 @@
+import numpy as np
+import tensorflow as tf
+from sympy import *
+import numpy as np
+import  sympy as sym
+from matplotlib import pyplot as plt
+from matplotlib import pyplot, cm
+from mpl_toolkits.mplot3d import Axes3D
+
+
+def f(x,y):
+    return exp(-x)*(x-2+y**3+6*y)
+
+def sigmoid(x):
+    return 1/(1+np.exp(-x))
+
+def neural_network(W, x):
+    a1 = sigmoid(np.dot(x, W[0])+b)
+    return np.dot(a1, W[1])
+
+def A(x,y):
+    return (1-x)*y**3+x*(1+y**3)*exp(-1)+(1-y)*x*(exp(-x)-exp(-1))+y*((1+x)*exp(-x)-(1-x-2*x*exp(-1)))
+
+def psy_trial(x, y,net_out):
+    return A(x,y) + x * (1 - x) * y * (1 - y) * net_out
+
+
+def loss_function(W,x,y):
+    loss_sum = 0.
+    net_out =  neural_network(W, np.array([x, y]))
+    psy_t1 = psy_trial(x, y,net_out)
+    x, y = symbols('x y', real=True)
+    gradient_of_trial_d2x = diff(psy_t1,x,2)
+    gradient_of_trial_d2y = diff(psy_t1,y,2)
+
+    func = f(x,y) # right part function
+
+    err_sqr =((gradient_of_trial_d2x + gradient_of_trial_d2y) - func)**2
+
+    loss_sum += err_sqr
+
+
+    return loss_sum
+
+
+
+x_space = np.linspace(0, 1, 10)
+y_space = np.linspace(0, 1, 10)
+b = np.random.rand(1, 10)
+W = [np.random.rand(2, 10), np.random.rand(10, 1)]
+lmb = 0.001
+A = neural_network(W, np.array([1,1]))
+print (A)
+
+for i in range(100):
+    #loss_grad =  grad(loss_function)(W, x_space, y_space)
+    W= symbols('W ', real=True)
+    def loss_grad_0(x,y):
+        return   diff(loss_function(W,x,y),W)
+    a = loss_grad_0(x_space,y_space)
+    W[0]=  W[0] - lmb * a[0]
+    W[1]=  W[1] - lmb * a[1]
+
+print (loss_function(W,x_space,y_space))
+
+
+
+surface2 = np.zeros((10, 10))
+for i, x in enumerate(x_space):
+    for j, y in enumerate(y_space):
+
+        net_outt = neural_network(W, np.array([x_space, y_space]))
+        def psy_trialdd(x,y):
+            return A(x,y) + x * (1 - x) * y * (1 - y) * net_outt
+        surface2[i][j] = psy_trialdd(x,y)
+
+
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+X, Y = np.meshgrid(x_space, y_space)
+surface2 =  psy_trial(x_space,y_space,net_outt)
+surf = ax.plot_surface(X, Y, surface2, rstride=1, cstride=1, cmap=plt.get_cmap('rainbow'))
+
+ax.set_xlim(0, 1)
+ax.set_ylim(0, 1)
+ax.set_zlim(0, 1)
+
+ax.set_xlabel('$x$')
+ax.set_ylabel('$y$');
+
+
+plt.show()
